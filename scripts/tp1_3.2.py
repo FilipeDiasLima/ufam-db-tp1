@@ -77,16 +77,6 @@ cur = conn.cursor()
 # 							FOREIGN KEY (asin) REFERENCES produtos (asin));
 #             """)
 
-# cur.execute("CREATE TABLE Product (id INTEGER PRIMARY KEY, asin VARCHAR(10) UNIQUE, title VARCHAR(500), group_name VARCHAR(50), sales_rank INTEGER);")
-
-# cur.execute("CREATE TABLE Category (id SERIAL PRIMARY KEY, name VARCHAR(500), parent_id INTEGER, FOREIGN KEY (parent_id) REFERENCES Category(id));")
-
-# cur.execute("CREATE TABLE ProductCategory (product_id INTEGER REFERENCES Product(id), category_id INTEGER REFERENCES Category(id), PRIMARY KEY (product_id, category_id));")
-
-# cur.execute("CREATE TABLE ProductSimilarity (product_id INTEGER REFERENCES Product(id), similar_asin VARCHAR(10) REFERENCES Product(asin), PRIMARY KEY (product_id, similar_asin));")
-
-# cur.execute("CREATE TABLE Review (id SERIAL PRIMARY KEY, product_id INTEGER REFERENCES Product(id), date DATE, customer_id VARCHAR(50), rating INTEGER, votes INTEGER, helpful INTEGER);")
-
 # Abrir o arquivo .txt para leitura
 with open('example.txt', 'r') as file:
     lines = file.readlines()
@@ -159,6 +149,10 @@ for line in lines:
             helpful_review = int(match.group(5))
             # Adicionar aqui a inserção de cada linha na tabela
             print(date_review, customer_review, rating_review, votes_review, helpful_review)
+    elif line.startswith('|'):
+        categories = re.findall(r'\|(.*?)\[.*?\]', line)
+        for category in categories:
+            print(category)
     else:
         continue
 		
