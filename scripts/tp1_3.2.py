@@ -14,71 +14,71 @@ conn = psycopg2.connect(
 # Criação das tabelas
 cur = conn.cursor()
 
-# cur.execute("""
-# 							CREATE TABLE grupos ( 
-# 							id_grupo serial NOT NULL, 
-# 							grupo TEXT, 
-# 							PRIMARY KEY (id_grupo));
-#             """)
+cur.execute("""
+							CREATE TABLE grupos ( 
+							id_grupo serial NOT NULL, 
+							grupo TEXT, 
+							PRIMARY KEY (id_grupo));
+            """)
 
-# cur.execute("""
-# 							CREATE TABLE produtos (
-# 							asin TEXT NOT NULL, 
-# 							titulo TEXT, 
-# 							vendas int, 
-# 							id_grupo int, 
-# 							PRIMARY KEY (asin), 
-# 							FOREIGN KEY (id_grupo) REFERENCES grupos (id_grupo));
-#             """)
+cur.execute("""
+							CREATE TABLE produtos (
+							asin TEXT NOT NULL, 
+							titulo TEXT, 
+							vendas int, 
+							id_grupo int, 
+							PRIMARY KEY (asin), 
+							FOREIGN KEY (id_grupo) REFERENCES grupos (id_grupo));
+            """)
 
-# cur.execute("""
-# 							CREATE TABLE similares (
-# 							id_sim serial NOT NULL, 
-# 							asin TEXT, 
-# 							asin_sim TEXT, 
-# 							PRIMARY KEY (id_sim), 
-# 							FOREIGN KEY (asin) REFERENCES produtos (asin));
-#             """)
+cur.execute("""
+							CREATE TABLE similares (
+							id_sim serial NOT NULL, 
+							asin TEXT, 
+							asin_sim TEXT, 
+							PRIMARY KEY (id_sim), 
+							FOREIGN KEY (asin) REFERENCES produtos (asin));
+            """)
 
-# cur.execute("""
-# 							CREATE TABLE categorias (
-# 							id_cat serial NOT NULL, 
-# 							categoria TEXT, 
-# 							PRIMARY KEY (id_cat));
-#             """)
+cur.execute("""
+							CREATE TABLE categorias (
+							id_cat serial NOT NULL, 
+							categoria TEXT, 
+							PRIMARY KEY (id_cat));
+            """)
 
-# cur.execute("""
-# 							CREATE TABLE produtos_categorias (
-# 							id_prodcat serial NOT NULL, 
-# 							asin TEXT, 
-# 							id_cat int, 
-# 							PRIMARY KEY (id_cat), 
-# 							FOREIGN KEY (asin) REFERENCES produtos (asin));
-#             """)
+cur.execute("""
+							CREATE TABLE produtos_categorias (
+							id_prodcat serial NOT NULL, 
+							asin TEXT, 
+							id_cat int, 
+							PRIMARY KEY (id_cat), 
+							FOREIGN KEY (asin) REFERENCES produtos (asin));
+            """)
 
-# cur.execute("""
-# 							CREATE TABLE clientes (
-# 							id_cli serial NOT NULL, 
-# 							cliente TEXT, 
-# 							PRIMARY KEY (id_cli));
-#             """)
+cur.execute("""
+							CREATE TABLE clientes (
+							id_cli serial NOT NULL, 
+							cliente TEXT, 
+							PRIMARY KEY (id_cli));
+            """)
 
-# cur.execute("""
-# 							CREATE TABLE avaliacoes(
-# 							id_ava serial NOT NULL, 
-# 							data date, 
-# 							media int, 
-# 							votos int, 
-# 							util int, 
-# 							id_cli int, 
-# 							asin TEXT, 
-# 							PRIMARY KEY (id_ava), 
-# 							FOREIGN KEY (id_cli) REFERENCES clientes (id_cli), 
-# 							FOREIGN KEY (asin) REFERENCES produtos (asin));
-#             """)
+cur.execute("""
+							CREATE TABLE avaliacoes(
+							id_ava serial NOT NULL, 
+							data date, 
+							media int, 
+							votos int, 
+							util int, 
+							id_cli int, 
+							asin TEXT, 
+							PRIMARY KEY (id_ava), 
+							FOREIGN KEY (id_cli) REFERENCES clientes (id_cli), 
+							FOREIGN KEY (asin) REFERENCES produtos (asin));
+            """)
 
 # Abrir o arquivo .txt para leitura
-with open('example.txt', 'r') as file:
+with open('amazon-meta.txt', 'r') as file:
     lines = file.readlines()
 
 # Variáveis para armazenar as informações do item atual
@@ -110,13 +110,9 @@ for line in lines:
         if current_id is not None:
             # Adicionar as informações do item atual à tabela, substitua "nome_da_tabela" pelo nome da tabela relevante
             # Exemplo de sintaxe de inserção em uma tabela SQL usando a biblioteca sqlite3
-            # cur.execute("""
-            #             INSERT INTO nome_da_tabela 
-            #               	(id, asin, title, group, salesrank, similar, categories, reviews) 
-            #                 VALUES (%(current_id)s, %(current_asin)s, %(current_title)s, %(current_group)s, %(current_salesrank)s, %(current_similar)s, %(current_categories)s, %(current_reviews)s)",
-            #                	(current_id, current_asin, current_title, current_group, current_salesrank, current_similar, current_categories, current_reviews)
-            #             """)
-            print("Adicionado à tabela: ", current_id, "\n")
+            cur.execute("INSERT INTO grupos (grupo) VALUES (%s)", (current_group,))
+            cur.execute("INSERT INTO produtos (asin, titulo, vendas, id_grupo) VALUES (%s, %s, %s, %s)", (current_asin, current_title, current_salesrank, current_group))
+            cur.execute("INSERT INTO similares (id_sim, asin, asin_sim) VALUES (%s, %s, %s)", (current_asin, current_title, current_salesrank, current_group))
         
         # Extrair o novo ID do item
         current_id = int(line.split(":")[1].strip())
@@ -161,13 +157,9 @@ for line in lines:
 if current_id is not None:
     # Adicionar as informações do item atual à tabela, substitua "nome_da_tabela" pelo nome da tabela relevante
     # Exemplo de sintaxe de inserção em uma tabela SQL usando a biblioteca sqlite3
-    # cur.execute("""
-		# 						INSERT INTO nome_da_tabela 
-		# 								(id, asin, title, group, salesrank, similar, categories, reviews) 
-		# 								VALUES (%(current_id)s, %(current_asin)s, %(current_title)s, %(current_group)s, %(current_salesrank)s, %(current_similar)s, %(current_categories)s, %(current_reviews)s)",
-		# 								(current_id, current_asin, current_title, current_group, current_salesrank, current_similar, current_categories, current_reviews)
-		# 						""")
-    print("Adicionado à tabela: ", current_id, "\n")
+    cur.execute("INSERT INTO grupos (grupo) VALUES (%s)", (current_group,))
+    cur.execute("INSERT INTO produtos (asin, titulo, vendas, id_grupo) VALUES (%s, %s, %s, %s)", (current_asin, current_title, current_salesrank, current_group))
+    cur.execute("INSERT INTO similares (id_sim, asin, asin_sim) VALUES (%s, %s, %s)", (current_asin, current_title, current_salesrank, current_group))
 
 
 conn.commit()
